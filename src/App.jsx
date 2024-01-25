@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import Modal from "react-modal";
@@ -33,46 +34,55 @@ const StarWarsApp = () => {
   //Fetching movies
   useEffect(() => {
     setLoading(true);
-    fetch("https://swapi.dev/api/films")
-      .then((response) => response.json())
-      .then((data) => setFilms(data.results))
+    axios.get("https://swapi.dev/api/films")
+      .then((response) => {
+        setFilms(response.data.results);
+        setLoading(false);
+      })
       .catch((error) => {
         console.error("Error fetching films:", error);
         setError(error);
+        setLoading(false);
       })
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false) })
   }, []);
 
   //Fetching characters
   const fetchCharacters = async (characters) => {
     setLoading(true);
 
-    const charactersData = await Promise.all(
-      characters.map(async (characterURL) => {
-        const response = await fetch(characterURL);
-        const character = await response.json();
-        const planetResponse = await fetch(character.homeworld);
-        const planetData = await planetResponse.json();
+    try {
+      const charactersData = await Promise.all(
+        characters.map(async (characterURL) => {
+          const characterResponse = await axios.get(characterURL);
+          const character = characterResponse.data;
 
-        return {
-          name: character.name,
-          eye_color: character.eye_color,
-          homeworld: planetData.name,
-          homweroldURL: character.homeworld,
-        };
-      })
-    );
+          const planetResponse = await axios.get(character.homeworld);
+          const planetData = planetResponse.data;
 
-    setSelectedFilm(charactersData);
-    setLoading(false);
+          return {
+            name: character.name,
+            eye_color: character.eye_color,
+            homeworld: planetData.name,
+            homweroldURL: character.homeworld,
+          };
+        })
+      );
+
+      setSelectedFilm(charactersData);
+    } catch (error) {
+      console.error("Error fetching characters:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePlanetClick = async (homeworld) => {
     setLoading(true);
 
     try {
-      const planetResponse = await fetch(homeworld);
-      const planetData = await planetResponse.json();
+      const planetResponse = await axios.get(homeworld);
+      const planetData = planetResponse.data;
 
       setSelectedPlanet(planetData);
       setIsPlanetModalOpen(true);

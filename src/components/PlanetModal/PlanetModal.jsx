@@ -1,20 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import './PlanetModal.css'
+import axios from 'axios';
+import './PlanetModal.css';
 
 const PlanetModal = ({ planetData, isOpen, onRequestClose }) => {
   const [residents, setResidents] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchResidents = async () => {
-      const residentsData = await Promise.all(
-        planetData.residents.map(async (residentURL) => {
-          const response = await fetch(residentURL);
-          const residentData = await response.json();
-          return residentData.name;
-        })
-      );
-      setResidents(residentsData);
+      try {
+        const residentsData = await Promise.all(
+          planetData.residents.map(async (residentURL) => {
+            const response = await axios.get(residentURL);
+            return response.data.name;
+          })
+        );
+        setResidents(residentsData);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching residents:", error);
+        setError("Error while loading residents");
+        setResidents([]);
+      }
     };
 
     if (isOpen) {
@@ -24,7 +32,7 @@ const PlanetModal = ({ planetData, isOpen, onRequestClose }) => {
 
     return () => {
       document.body.classList.remove('body-overflow-hidden');
-    }
+    };
   }, [planetData, isOpen]);
 
   return (
@@ -38,20 +46,22 @@ const PlanetModal = ({ planetData, isOpen, onRequestClose }) => {
       </div>
 
       <h3 className='mb-3'>Residents:</h3>
-      <div className='d-flex flex-column flex-md-row gap-2 flex-wrap'>
-        {residents.map((resident, index) => (
-          <p
-            key={index}
-            className="mb-0"
-          >
-            {resident}
-          </p>
-        ))}
-      </div>
+      {error ? (
+        <p className="text-warning">Error while getting residents data</p>
+      ) : (
+        <div className='d-flex flex-column flex-md-row gap-2 flex-wrap'>
+          {residents.map((resident) => (
+            <p
+              key={resident.name}
+              className="mb-0"
+            >
+              {resident}
+            </p>
+          ))}
+        </div>
+      )}
     </Modal>
   );
 };
 
 export default PlanetModal;
-
-
