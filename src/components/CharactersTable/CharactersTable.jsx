@@ -25,7 +25,10 @@ const CharactersTable = ({ characters, onPlanetClick }) => {
 
   useEffect(() => {
     setSortedCharacters([...characters]);
-  }, [characters]);
+    if (filterText === "") {
+      setSortOrder("default");
+    }
+  }, [characters, filterText]);
 
   const handleSort = (e) => {
     const newSortOrder = e.target.value;
