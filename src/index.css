@@ -13,6 +13,10 @@ body {
   background: radial-gradient(circle at bottom, navy 0, black 100%);
 }
 
+.body-overflow-hidden {
+  overflow: hidden;
+}
+
 h2 {
   margin-bottom: 0;
 }

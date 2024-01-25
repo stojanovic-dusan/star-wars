@@ -19,6 +19,11 @@ const PlanetModal = ({ planetData, isOpen, onRequestClose }) => {
 
     if (isOpen) {
       fetchResidents();
+      document.body.classList.add('body-overflow-hidden');
+    }
+
+    return () => {
+      document.body.classList.remove('body-overflow-hidden');
     }
   }, [planetData, isOpen]);
 
