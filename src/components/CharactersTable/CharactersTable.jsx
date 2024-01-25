@@ -7,8 +7,8 @@ const CharactersTable = ({ characters, onPlanetClick }) => {
   const [sortOrder, setSortOrder] = useState("default");
   const [filterText, setFilterText] = useState("");
 
-  const sortCharacters = useCallback(() => {
-    let sorted = [...characters];
+  const sortCharacters = useCallback((charactersToSort) => {
+    let sorted = [...charactersToSort];
 
     if (sortOrder === "asc") {
       sorted = sorted.sort((a, b) => a.name.localeCompare(b.name));
@@ -17,27 +17,34 @@ const CharactersTable = ({ characters, onPlanetClick }) => {
     }
 
     setSortedCharacters(sorted);
-  }, [characters, sortOrder]);
+  }, [sortOrder]);
 
   useEffect(() => {
-    sortCharacters();
-  }, [sortCharacters]);
-
-  useEffect(() => {
-    setSortedCharacters([...characters]);
     if (filterText === "") {
-      setSortOrder("default");
+      sortCharacters([...characters]);
     }
-  }, [characters, filterText]);
+  }, [characters, filterText, sortCharacters]);
 
   const handleSort = (e) => {
     const newSortOrder = e.target.value;
     setSortOrder(newSortOrder);
+    sortCharacters(sortedCharacters);
   };
 
   const handleFilterByName = () => {
-    const filteredCharacters = characters.filter((character) => character.name.toLowerCase().includes(filterText.toLowerCase()));
-    setSortedCharacters(filteredCharacters);
+    if (filterText.trim() === "") {
+      setSortedCharacters([...characters]);
+    } else {
+      const filteredCharacters = characters.filter((character) =>
+        character.name.toLowerCase().includes(filterText.toLowerCase())
+      );
+      setSortedCharacters(filteredCharacters);
+    }
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && filterText.trim() !== "") {
+      handleFilterByName();
+    }
   };
 
   return (
@@ -62,7 +69,7 @@ const CharactersTable = ({ characters, onPlanetClick }) => {
             placeholder="Filter by name"
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleFilterByName()}
+            onKeyPress={(e) => handleKeyPress(e)}
             className="border me-2 form-control"
           />
           <button onClick={handleFilterByName} className="border btn btn-dark btn-md px-3">
