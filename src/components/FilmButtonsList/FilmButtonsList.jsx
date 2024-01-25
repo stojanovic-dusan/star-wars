@@ -1,6 +1,6 @@
 import React from 'react';
 import FilmButton from '../FilmButton/FilmButton';
-import './FilmButtonList.css'
+import './FilmButtonsList.css'
 
 const FilmButtonsList = ({ films, onFilmClick, activeFilmButton }) => (
     <div className="buttons-container mb-5 d-flex flex-md-wrap justify-content-md-center">
