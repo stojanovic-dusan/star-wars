@@ -1,0 +1,15 @@
+@media(max-width: 767px) {
+    .buttons-container {
+        overflow: auto;
+        margin-right: -12px;
+        padding-right: 12px;
+    }
+
+    .buttons-container::-webkit-scrollbar {
+        width: 0 !important
+    }
+
+    .buttons-container {
+        scrollbar-width: none;
+    }
+}

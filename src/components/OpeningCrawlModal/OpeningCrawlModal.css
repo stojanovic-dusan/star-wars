@@ -1,0 +1,7 @@
+.modal.fade .modal-dialog {
+    transform: translate(0, 150%);
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}

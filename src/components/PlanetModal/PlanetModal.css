@@ -1,0 +1,32 @@
+.ReactModal__Overlay {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    opacity: 0;
+    transition: all 500ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+    opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+    opacity: 0;
+}
+
+.ReactModal__Content {
+    transition: all 500ms ease-in-out;
+    background: radial-gradient(circle at bottom, navy 0, black 100%) !important;
+    transform: translateY(400px);
+}
+
+.ReactModal__Content--after-open {
+    transform: translateY(0);
+}
+
+@media(min-width: 768px) {
+    .ReactModal__Content {
+        max-width: 650px;
+        max-height: 650px;
+        margin: auto;
+        overflow-y: auto;
+    }
+}

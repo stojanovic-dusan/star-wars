@@ -1,0 +1,20 @@
+.film-container.active .btn {
+    color: var(--bs-btn-hover-color);
+    background-color: var(--bs-btn-hover-bg);
+    border-color: var(--bs-btn-hover-border-color);
+}
+
+.film-container:first-of-type button {
+    margin-left: 0 !important;
+}
+
+.film-container:last-of-type button {
+    margin-right: 0 !important;
+}
+
+@media(max-width: 767px) {
+    .film-container button {
+        white-space: nowrap;
+        margin: 0.4rem !important;
+    }
+}
