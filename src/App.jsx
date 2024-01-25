@@ -16,7 +16,6 @@ import AppTitle from "./components/AppTitle";
 Modal.setAppElement("#root");
 
 const StarWarsApp = () => {
-
   //States hooks
   const [films, setFilms] = useState([]);
   const [selectedFilm, setSelectedFilm] = useState(null);
@@ -29,13 +28,18 @@ const StarWarsApp = () => {
   const [selectedOpeningCrawl, setSelectedOpeningCrawl] = useState();
   const [showOpeningCrawlButton, setShowOpeningCrawlButton] = useState(false);
 
+  const [error, setError] = useState(null);
+
   //Fetching movies
   useEffect(() => {
     setLoading(true);
     fetch("https://swapi.dev/api/films")
       .then((response) => response.json())
       .then((data) => setFilms(data.results))
-      .catch((error) => console.error("Error fetching films:", error))
+      .catch((error) => {
+        console.error("Error fetching films:", error);
+        setError(error);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -82,7 +86,7 @@ const StarWarsApp = () => {
   const handleFilmButtonClick = (selectedFilm) => {
     fetchCharacters(selectedFilm.characters);
     setSelectedFilmTitle(selectedFilm.title);
-    setActiveFilmButton(selectedFilm)
+    setActiveFilmButton(selectedFilm);
     setSelectedOpeningCrawl(selectedFilm.opening_crawl);
     setShowOpeningCrawlButton(true);
   };
@@ -93,44 +97,30 @@ const StarWarsApp = () => {
     <>
       {loading && <Loader />}
 
-      <div className="container mt-5">
-        <AppTitle />
-        <FilmButtonsList
-          films={films}
-          onFilmClick={handleFilmButtonClick}
-          activeFilmButton={activeFilmButton}
-        />
+      {error && (
+        <div className="container mt-5">
+          <h1 className="text-danger">There has been an error, try reloading the page.</h1>
+        </div>
+      )}
 
-        {selectedFilm && (
-          <>
-            <FilmDetails 
-              selectedFilmTitle={selectedFilmTitle} 
-              showOpeningCrawlButton={showOpeningCrawlButton} 
-              onOpeningCrawlClick={handleOpeningCrawlClick} 
-              film={selectedFilm} 
-            />
+      {!error && (
+        <div className="container mt-5">
+          <AppTitle />
+          <FilmButtonsList films={films} onFilmClick={handleFilmButtonClick} activeFilmButton={activeFilmButton} />
 
-            <CharactersTable 
-              characters={selectedFilm} 
-              onPlanetClick={handlePlanetClick} 
-            />
+          {selectedFilm && (
+            <>
+              <FilmDetails selectedFilmTitle={selectedFilmTitle} showOpeningCrawlButton={showOpeningCrawlButton} onOpeningCrawlClick={handleOpeningCrawlClick} film={selectedFilm} />
 
-            {selectedPlanet && 
-              <PlanetModal 
-                isOpen={isPlanetModalOpen} 
-                onRequestClose={() => setIsPlanetModalOpen(false)} 
-                planetData={selectedPlanet} 
-              />}
-          </>
-        )}
+              <CharactersTable characters={selectedFilm} onPlanetClick={handlePlanetClick} />
 
-        {isOpeningCrawlModalOpen && 
-          <OpeningCrawlModal 
-            isOpen={isOpeningCrawlModalOpen} 
-            onRequestClose={() => setIsOpeningCrawlModalOpen(false)} 
-            openingCrawl={selectedOpeningCrawl} 
-          />}
-      </div>
+              {selectedPlanet && <PlanetModal isOpen={isPlanetModalOpen} onRequestClose={() => setIsPlanetModalOpen(false)} planetData={selectedPlanet} />}
+            </>
+          )}
+
+          {isOpeningCrawlModalOpen && <OpeningCrawlModal isOpen={isOpeningCrawlModalOpen} onRequestClose={() => setIsOpeningCrawlModalOpen(false)} openingCrawl={selectedOpeningCrawl} />}
+        </div>
+      )}
       <GalaxySky />
     </>
   );

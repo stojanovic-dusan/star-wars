@@ -3,43 +3,47 @@ import { Tooltip } from "react-tooltip";
 import "./CharactersTable.css";
 
 const CharactersTable = ({ characters, onPlanetClick }) => {
-    const [sortedCharacters, setSortedCharacters] = useState([...characters]);
-    const [sortOrder, setSortOrder] = useState('asc');
-    const [filterText, setFilterText] = useState('');
+  const [sortedCharacters, setSortedCharacters] = useState([]);
+  const [sortOrder, setSortOrder] = useState("default");
+  const [filterText, setFilterText] = useState("");
 
-    const sortCharacters = useCallback(() => {
-        const sorted = [...characters].sort((a, b) => {
-            const nameA = a.name.toUpperCase();
-            const nameB = b.name.toUpperCase();
+  const sortCharacters = useCallback(() => {
+    let sorted = [...characters];
 
-            return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-        });
+    if (sortOrder === "asc") {
+      sorted = sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortOrder === "desc") {
+      sorted = sorted.sort((a, b) => b.name.localeCompare(a.name));
+    }
 
-        setSortedCharacters(sorted);
-    }, [characters, sortOrder]);
+    setSortedCharacters(sorted);
+  }, [characters, sortOrder]);
 
-    useEffect(() => {
-        sortCharacters();
-    }, [sortCharacters]);
+  useEffect(() => {
+    sortCharacters();
+  }, [sortCharacters]);
 
-    const handleSort = () => {
-        const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-        setSortOrder(newSortOrder);
-    };
+  useEffect(() => {
+    setSortedCharacters([...characters]);
+  }, [characters]);
 
-    const handleFilterByName = () => {
-        const filteredCharacters = characters.filter((character) =>
-            character.name.toLowerCase().includes(filterText.toLowerCase())
-        );
-        setSortedCharacters(filteredCharacters);
-    };
+  const handleSort = (e) => {
+    const newSortOrder = e.target.value;
+    setSortOrder(newSortOrder);
+  };
+
+  const handleFilterByName = () => {
+    const filteredCharacters = characters.filter((character) => character.name.toLowerCase().includes(filterText.toLowerCase()));
+    setSortedCharacters(filteredCharacters);
+  };
 
   return (
     <section className="section-characters py-3 py-md-4">
       <div className="filter-inputs d-flex flex-column flex-md-row align-items-md-center justify-content-md-center mb-3">
         <div className="me-md-3 mb-3 mb-md-0">
           <label htmlFor="sortOrder">Sort characters by name: </label>
-          <select id="sortOrder" onChange={handleSort} value={sortOrder} className="ms-2">
+          <select id="sortOrder" onChange={handleSort} value={sortOrder} className="ms-2 p-1 border">
+            <option value="default">Default</option>
             <option value="asc">A-Z</option>
             <option value="desc">Z-A</option>
           </select>
