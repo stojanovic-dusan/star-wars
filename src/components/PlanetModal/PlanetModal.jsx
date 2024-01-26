@@ -50,9 +50,9 @@ const PlanetModal = ({ planetData, isOpen, onRequestClose }) => {
         <p className="text-warning">Error while getting residents data</p>
       ) : (
         <div className='d-flex flex-column flex-md-row gap-2 flex-wrap'>
-          {residents.map((resident) => (
+          {residents.map((resident, index) => (
             <p
-              key={resident.name}
+              key={index}
               className="mb-0"
             >
               {resident}
