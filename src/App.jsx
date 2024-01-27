@@ -17,7 +17,7 @@ import AppTitle from "./components/AppTitle";
 Modal.setAppElement("#root");
 
 const StarWarsApp = () => {
-  //States hooks
+  // States hooks
   const [films, setFilms] = useState([]);
   const [selectedFilm, setSelectedFilm] = useState(null);
   const [activeFilmButton, setActiveFilmButton] = useState(null);
@@ -28,15 +28,16 @@ const StarWarsApp = () => {
   const [isOpeningCrawlModalOpen, setIsOpeningCrawlModalOpen] = useState(false);
   const [selectedOpeningCrawl, setSelectedOpeningCrawl] = useState();
   const [showOpeningCrawlButton, setShowOpeningCrawlButton] = useState(false);
-
   const [error, setError] = useState(null);
+  const [planetCache, setPlanetCache] = useState({});
 
-  //Fetching movies
+  // Fetching movies
   useEffect(() => {
     setLoading(true);
     axios.get("https://swapi.dev/api/films")
       .then((response) => {
         setFilms(response.data.results);
+        console.log(response.data.results);
         setLoading(false);
       })
       .catch((error) => {
@@ -47,7 +48,7 @@ const StarWarsApp = () => {
       .finally(() => { setLoading(false) })
   }, []);
 
-  //Fetching characters
+  // Fetching characters
   const fetchCharacters = async (characters) => {
     setLoading(true);
 
@@ -57,8 +58,14 @@ const StarWarsApp = () => {
           const characterResponse = await axios.get(characterURL);
           const character = characterResponse.data;
 
-          const planetResponse = await axios.get(character.homeworld);
-          const planetData = planetResponse.data;
+          // Check if planet data is cached
+          let planetData = planetCache[character.homeworld];
+          if (!planetData) {
+            const planetResponse = await axios.get(character.homeworld);
+            planetData = planetResponse.data;
+            // Update planet cache
+            setPlanetCache(prevCache => ({ ...prevCache, [character.homeworld]: planetData }));
+          }
 
           return {
             name: character.name,
@@ -81,8 +88,14 @@ const StarWarsApp = () => {
     setLoading(true);
 
     try {
-      const planetResponse = await axios.get(homeworld);
-      const planetData = planetResponse.data;
+      // Check if planet data is cached
+      let planetData = planetCache[homeworld];
+      if (!planetData) {
+        const planetResponse = await axios.get(homeworld);
+        planetData = planetResponse.data;
+        // Update planet cache
+        setPlanetCache(prevCache => ({ ...prevCache, [homeworld]: planetData }));
+      }
 
       setSelectedPlanet(planetData);
       setIsPlanetModalOpen(true);
