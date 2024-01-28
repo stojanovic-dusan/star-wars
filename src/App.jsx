@@ -37,24 +37,25 @@ const StarWarsApp = () => {
     axios.get("https://swapi.dev/api/films")
       .then((response) => {
         setFilms(response.data.results);
-        console.log(response.data.results);
         setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching films:", error);
         setError(error);
         setLoading(false);
-      })
-      .finally(() => { setLoading(false) })
+      });
   }, []);
 
-  // Fetching characters
-  const fetchCharacters = async (characters) => {
+  // Fetching characters for a specific film
+  const fetchCharactersForFilm = async (filmUrl) => {
     setLoading(true);
 
     try {
+      const response = await axios.get(filmUrl);
+      const filmData = response.data;
+
       const charactersData = await Promise.all(
-        characters.map(async (characterURL) => {
+        filmData.characters.map(async (characterURL) => {
           const characterResponse = await axios.get(characterURL);
           const character = characterResponse.data;
 
@@ -77,12 +78,22 @@ const StarWarsApp = () => {
       );
 
       setSelectedFilm(charactersData);
+      setSelectedFilmTitle(filmData.title);
+      setShowOpeningCrawlButton(true);
+      setSelectedOpeningCrawl(filmData.opening_crawl);
     } catch (error) {
-      console.error("Error fetching characters:", error);
+      console.error("Error fetching characters for film:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleFilmButtonClick = (selectedFilm) => {
+    setActiveFilmButton(selectedFilm);
+    fetchCharactersForFilm(selectedFilm.url);
+  };
+
+  const handleOpeningCrawlClick = () => setIsOpeningCrawlModalOpen(true);
 
   const handlePlanetClick = async (homeworld) => {
     setLoading(true);
@@ -105,16 +116,6 @@ const StarWarsApp = () => {
       setLoading(false);
     }
   };
-
-  const handleFilmButtonClick = (selectedFilm) => {
-    fetchCharacters(selectedFilm.characters);
-    setSelectedFilmTitle(selectedFilm.title);
-    setActiveFilmButton(selectedFilm);
-    setSelectedOpeningCrawl(selectedFilm.opening_crawl);
-    setShowOpeningCrawlButton(true);
-  };
-
-  const handleOpeningCrawlClick = () => setIsOpeningCrawlModalOpen(true);
 
   return (
     <>
